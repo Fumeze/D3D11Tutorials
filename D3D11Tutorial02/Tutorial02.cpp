@@ -18,7 +18,7 @@ ID3D11Buffer *pVBuffer = nullptr;                // the pointer to the vertex bu
 
 struct VERTEX
 {
-	FLOAT X, Y, Z;
+	XMFLOAT3 pos;
 	XMFLOAT4 color;
 };
 
@@ -214,9 +214,9 @@ void InitGraphics(void)
 	// create a triangle using the VERTEX struct
 	VERTEX OurVertices[] =
 	{
-		{0.0f, 0.5f, 0.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-		{0.45f, -0.5, 0.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-		{-0.45f, -0.5f, 0.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)}
+		{XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+		{XMFLOAT3(0.45f, -0.5, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
+		{XMFLOAT3(-0.45f, -0.5f, 0.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)}
 	};
 
 	// create the vertex buffer
