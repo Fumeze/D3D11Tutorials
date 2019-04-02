@@ -1,7 +1,7 @@
 // include the basic windows header files and the Direct3D header files
 #include <windows.h>
-#include <tchar.h>
-#include <d3d11.h>
+#include <windowsx.h>
+#include <d3d11_1.h>
 #include <directxcolors.h>
 
 using namespace DirectX;
@@ -37,7 +37,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	wc.hInstance = hInstance;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	wc.lpszClassName = _T("WindowClass");
+	wc.lpszClassName = L"WindowClass";
 
 	RegisterClassEx(&wc);
 
@@ -45,8 +45,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
 
 	hWnd = CreateWindowEx(NULL,
-		_T("WindowClass"),
-		_T("Our First Direct3D Program"),
+		L"WindowClass",
+		L"Our First Direct3D Program",
 		WS_OVERLAPPEDWINDOW,
 		300,
 		300,
