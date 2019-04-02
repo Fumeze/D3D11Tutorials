@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <d3d11.h>
+#include <windowsx.h>
 #include <d3d11_1.h>
 #include <directxcolors.h>
 #include <d3dcompiler.h>
@@ -15,11 +15,13 @@ ID3D11InputLayout *pLayout = nullptr;            // the pointer to the input lay
 ID3D11VertexShader *pVS = nullptr;               // the pointer to the vertex shader
 ID3D11PixelShader *pPS = nullptr;                // the pointer to the pixel shader
 ID3D11Buffer *pVBuffer = nullptr;                // the pointer to the vertex buffer
+ID3D11ShaderResourceView* colorMap_;
+ID3D11SamplerState* colorMapSampler_;
 
 struct VERTEX
 {
 	XMFLOAT3 pos;
-	XMFLOAT4 color;
+	XMFLOAT2 tex;
 };
 
 // function prototypes
@@ -28,9 +30,6 @@ void RenderFrame(void);     // renders a single frame
 void CleanD3D(void);        // closes Direct3D and releases memory
 void InitGraphics(void);    // creates the shape to render
 void InitPipeline(void);    // loads and prepares the shaders
-
-//CompileHelper
-void CompileShaderFromFile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut);
 
 // the WindowProc function prototype
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -214,9 +213,9 @@ void InitGraphics(void)
 	// create a triangle using the VERTEX struct
 	VERTEX OurVertices[] =
 	{
-		{XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(0.45f, -0.5, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(-0.45f, -0.5f, 0.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)}
+		{XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f)},
+		{XMFLOAT3(0.45f, -0.5, 0.0f), XMFLOAT2(1.0f, 0.0f)},
+		{XMFLOAT3(-0.45f, -0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f)}
 	};
 
 	// create the vertex buffer
@@ -241,8 +240,8 @@ void InitPipeline(void)
 {
 	// load and compile the two shaders
 	ID3DBlob *VS = nullptr, *PS = nullptr;
-	CompileShaderFromFile(L"shaders.fx", "VShader", "vs_4_0", &VS);
-	CompileShaderFromFile(L"shaders.fx", "PShader", "ps_4_0", &PS);
+	D3DCompileFromFile(L"shaders.fx", nullptr, nullptr, "VShader", "vs_4_0", 0, 0, &VS, nullptr);
+	D3DCompileFromFile(L"shaders.fx", nullptr, nullptr, "PShader", "ps_4_0", 0, 0, &PS, nullptr);
 
 	// encapsulate both shaders into shader objects
 	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), nullptr, &pVS);
@@ -259,34 +258,12 @@ void InitPipeline(void)
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
+	D3D11_INPUT_ELEMENT_DESC solidColorLayout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
 	dev->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
 	devcon->IASetInputLayout(pLayout);
-}
-
-void CompileShaderFromFile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut)
-{
-	HRESULT hr = S_OK;
-	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef _DEBUG
-	// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
-	// Setting this flag improves the shader debugging experience, but still allows
-	// the shaders to be optimized and to run exactly the way they will run in
-	// the release configuration of this program.
-	dwShaderFlags |= D3DCOMPILE_DEBUG;
-	// Disable optimizations to further improve shader debugging
-	dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	ID3DBlob* pErrorBlob = nullptr;
-	hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel,
-		dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
-	if (FAILED(hr))
-	{
-		if (pErrorBlob)
-		{
-			OutputDebugStringA(reinterpret_cast<const char*>(pErrorBlob->GetBufferPointer()));
-			pErrorBlob->Release();
-		}
-	}
-	if (pErrorBlob) pErrorBlob->Release();
 }
