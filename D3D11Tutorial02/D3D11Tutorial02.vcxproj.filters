@@ -26,18 +26,29 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders.fx">
-      <Filter>shaders</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="DDSTextureLoader.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>资源文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="seafloor.dds">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="directx.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Tutorial02.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Tutorial02.fx">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
